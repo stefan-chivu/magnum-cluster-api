@@ -1170,7 +1170,7 @@ class ClusterClass(Base):
                         },
                         {
                             "name": "flatcar",
-                            "enabledIf": "{{ if eq .operatingSystem \"flatcar\" }}true{{end}}",
+                            "enabledIf": '{{ if eq .operatingSystem "flatcar" }}true{{end}}',
                             "definitions": [
                                 {
                                     "selector": {
@@ -1233,7 +1233,7 @@ class ClusterClass(Base):
                                         {
                                             "op": "add",
                                             "path": "/spec/template/spec/ignition",
-                                            "value":{
+                                            "value": {
                                                 "containerLinuxConfig": {
                                                     "additionalConfig": textwrap.dedent(
                                                         """\
