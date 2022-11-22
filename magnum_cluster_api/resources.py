@@ -1191,10 +1191,10 @@ class ClusterClass(Base):
                                                         "additionalConfig": textwrap.dedent(
                                                             """\
                                                             storage:
-                                                                links:
-                                                                - path: /etc/systemd/system/kubeadm.service.wants/containerd.service
+                                                              links:
+                                                              - path: /etc/systemd/system/kubeadm.service.wants/containerd.service
                                                                 target: /usr/lib/systemd/system/containerd.service
-                                                            """
+                                                            """  # noqa: E501
                                                         ),
                                                     },
                                                 },
@@ -1202,12 +1202,12 @@ class ClusterClass(Base):
                                         },
                                         {
                                             "op": "replace",
-                                            "path": "/spec/template/spec/kubeadmConfigSpec/initConfiguration/nodeRegistration/name",
+                                            "path": "/spec/template/spec/kubeadmConfigSpec/initConfiguration/nodeRegistration/name",  # noqa: E501
                                             "value": "${COREOS_OPENSTACK_HOSTNAME}",
                                         },
                                         {
                                             "op": "replace",
-                                            "path": "/spec/template/spec/kubeadmConfigSpec/joinConfiguration/nodeRegistration/name",
+                                            "path": "/spec/template/spec/kubeadmConfigSpec/joinConfiguration/nodeRegistration/name",  # noqa: E501
                                             "value": "${COREOS_OPENSTACK_HOSTNAME}",
                                         },
                                     ],
@@ -1233,10 +1233,10 @@ class ClusterClass(Base):
                                                         "additionalConfig": textwrap.dedent(
                                                             """\
                                                             storage:
-                                                                links:
-                                                                - path: /etc/systemd/system/kubeadm.service.wants/containerd.service
+                                                              links:
+                                                              - path: /etc/systemd/system/kubeadm.service.wants/containerd.service
                                                                 target: /usr/lib/systemd/system/containerd.service
-                                                            """
+                                                            """  # noqa: E501
                                                         ),
                                                     },
                                                 },
