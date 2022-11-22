@@ -20,7 +20,6 @@ import pykube
 import shortuuid
 import yaml
 from magnum import objects as magnum_objects
-from magnum.api import utils as api_utils
 from magnum.common import context, exception, octavia
 from magnum.common import utils as magnum_utils
 from oslo_serialization import base64
