@@ -1220,6 +1220,7 @@ class ClusterClass(Base):
                                                             - name: 20-clct-provider-override.conf
                                                               contents: |
                                                                 [Service]
+                                                                # Set Openstack as coreos-metadata provider
                                                                 Environment=COREOS_METADATA_OPT_PROVIDER=--provider=openstack-metadata
                                                           - name: coreos-metadata-sshkeys@.service
                                                             enabled: true
@@ -1227,6 +1228,7 @@ class ClusterClass(Base):
                                                             - name: 20-clct-provider-override.conf
                                                               contents: |
                                                                 [Service]
+                                                                # Set Openstack as coreos-metadata provider
                                                                 Environment=COREOS_METADATA_OPT_PROVIDER=--provider=openstack-metadata
                                                           - name: kubeadm.service
                                                             dropins:
