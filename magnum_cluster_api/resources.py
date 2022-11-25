@@ -1011,6 +1011,19 @@ class ClusterClass(Base):
                                 },
                             },
                         },
+                        {
+                            "name": "ntpServers",
+                            "required": True,
+                            "schema": {
+                                "openAPIV3Schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                    },
+                                    "default": [],
+                                },
+                            },
+                        },
                     ],
                     "patches": [
                         {
@@ -1166,6 +1179,60 @@ class ClusterClass(Base):
                                         },
                                     ],
                                 }
+                            ],
+                        },
+                        {
+                            "name": "ntpServers",
+                            "enabledIf": "{{ if gt (len .ntpServers) }}true{{end}}",
+                            "definitions": [
+                                {
+                                    "selector": {
+                                        "apiVersion": objects.KubeadmControlPlaneTemplate.version,
+                                        "kind": objects.KubeadmControlPlaneTemplate.kind,
+                                        "matchResources": {
+                                            "controlPlane": True,
+                                        },
+                                    },
+                                    "jsonPatches": [
+                                        {
+                                            "op": "add",
+                                            "path": "/spec/template/spec/kubeadmConfigSpec/ntp/enabled",
+                                            "value": True,
+                                        },
+                                        {
+                                            "op": "add",
+                                            "path": "/spec/template/spec/kubeadmConfigSpec/ntp/servers",
+                                            "valueFrom": {
+                                                "variable": "ntpServers",
+                                            },
+                                        },
+                                    ],
+                                },
+                                {
+                                    "selector": {
+                                        "apiVersion": objects.KubeadmConfigTemplate.version,
+                                        "kind": objects.KubeadmConfigTemplate.kind,
+                                        "matchResources": {
+                                            "machineDeploymentClass": {
+                                                "names": ["default-worker"],
+                                            }
+                                        },
+                                    },
+                                    "jsonPatches": [
+                                        {
+                                            "op": "add",
+                                            "path": "/spec/template/spec/ntp/enabled",
+                                            "value": True,
+                                        },
+                                        {
+                                            "op": "add",
+                                            "path": "/spec/template/spec/ntp/servers",
+                                            "valueFrom": {
+                                                "variable": "ntpServers",
+                                            },
+                                        },
+                                    ],
+                                },
                             ],
                         },
                         {
@@ -2023,6 +2090,10 @@ class Cluster(ClusterBase):
                             {
                                 "name": "operatingSystem",
                                 "value": utils.get_operating_system(self.cluster),
+                            },
+                            {
+                                "name": "ntpServers",
+                                "value": utils.get_ntp_servers(self.cluster),
                             },
                         ],
                     },
