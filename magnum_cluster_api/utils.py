@@ -20,9 +20,9 @@ import pykube
 import shortuuid
 import yaml
 from magnum import objects as magnum_objects
-from magnum.common import context, exception, octavia
+from magnum.common import context, exception, neutron, octavia
 from oslo_serialization import base64
-from oslo_utils import strutils
+from oslo_utils import strutils, uuidutils
 from tenacity import retry, retry_if_exception_type
 
 from magnum_cluster_api import clients
@@ -261,7 +261,37 @@ def format_event_message(event: pykube.Event):
     )
 
 
-def validate_cluster(cluster: magnum_objects.Cluster):
+def validate_cluster(cluster: magnum_objects.Cluster, context: context.RequestContext):
     # Check master count
     if (cluster.master_count % 2) == 0:
         raise mcapi_exceptions.ClusterMasterCountEven
+
+    # Check if fixed_network exists
+    if cluster.fixed_network:
+        if uuidutils.is_uuid_like(cluster.fixed_network):
+            neutron.get_network(
+                context,
+                cluster.fixed_network,
+                source="id",
+                target="name",
+                external=False,
+            )
+        else:
+            neutron.get_network(
+                context,
+                cluster.fixed_network,
+                source="name",
+                target="id",
+                external=False,
+            )
+
+    # Check if fixed_subnet exists
+    if cluster.fixed_subnet:
+        if uuidutils.is_uuid_like(cluster.fixed_subnet):
+            neutron.get_subnet(
+                context, cluster.fixed_subnet, source="id", target="name"
+            )
+        else:
+            neutron.get_subnet(
+                context, cluster.fixed_subnet, source="name", target="id"
+            )
