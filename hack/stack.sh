@@ -20,7 +20,7 @@ sudo chown -R ${USER}. /opt/stack
 
 # Clone repository if not present, otherwise update
 if [ ! -f /opt/stack/stack.sh ]; then
-    git clone https://git.openstack.org/openstack-dev/devstack /opt/stack
+    git clone https://git.openstack.org/openstack-dev/devstack --branch=stable/zed /opt/stack
 else
     pushd /opt/stack
     git pull
@@ -30,8 +30,12 @@ fi
 # Create DevStack configuration file
 cat <<EOF > /opt/stack/local.conf
 [[local|localrc]]
+#RECLONE=yes
+
 # General
 GIT_BASE=https://github.com
+
+TARGET_BRANCH=stable/zed
 
 # Secrets
 DATABASE_PASSWORD=root
@@ -52,24 +56,24 @@ VOLUME_BACKING_FILE_SIZE=50G
 LIBVIRT_TYPE=kvm
 
 # Neutron
-enable_plugin neutron https://opendev.org/openstack/neutron
+enable_plugin neutron https://opendev.org/openstack/neutron \$TARGET_BRANCH
 FIXED_RANGE=10.1.0.0/20
 
 # Barbican
-enable_plugin barbican https://opendev.org/openstack/barbican
+enable_plugin barbican https://opendev.org/openstack/barbican \$TARGET_BRANCH
 
 # Octavia
-enable_plugin octavia https://opendev.org/openstack/octavia
-enable_plugin ovn-octavia-provider https://opendev.org/openstack/ovn-octavia-provider
+enable_plugin octavia https://opendev.org/openstack/octavia \$TARGET_BRANCH
+enable_plugin ovn-octavia-provider https://opendev.org/openstack/ovn-octavia-provider \$TARGET_BRANCH
 enable_service octavia o-api o-cw o-hm o-hk o-da
 
 # Magnum
-enable_plugin magnum https://opendev.org/openstack/magnum
+enable_plugin magnum https://opendev.org/openstack/magnum \$TARGET_BRANCH
 
 # Manila
 LIBS_FROM_GIT=python-manilaclient
-enable_plugin manila https://opendev.org/openstack/manila
-enable_plugin manila-ui https://opendev.org/openstack/manila-ui
+enable_plugin manila https://opendev.org/openstack/manila \$TARGET_BRANCH
+enable_plugin manila-ui https://opendev.org/openstack/manila-ui \$TARGET_BRANCH
 enable_plugin manila-tempest-plugin https://opendev.org/openstack/manila-tempest-plugin
 
 SHARE_DRIVER=manila.share.drivers.generic.GenericShareDriver
@@ -130,10 +134,10 @@ export EXP_CLUSTER_RESOURCE_SET=true
 export EXP_KUBEADM_BOOTSTRAP_FORMAT_IGNITION=true #Used by the kubeadm bootstrap provider
 export CLUSTER_TOPOLOGY=true
 clusterctl init \
-  --core cluster-api:v1.4.4 \
-  --bootstrap kubeadm:v1.4.4 \
-  --control-plane kubeadm:v1.4.4 \
-  --infrastructure openstack:v0.7.1
+  --core cluster-api:v1.5.1 \
+  --bootstrap kubeadm:v1.5.1 \
+  --control-plane kubeadm:v1.5.1 \
+  --infrastructure openstack:v0.8.0-alpha.0
 
 # Vendor the chart
 make vendor
