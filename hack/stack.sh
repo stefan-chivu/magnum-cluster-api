@@ -148,3 +148,9 @@ $HOME/.local/bin/pip3 install -e .
 
 # Restart Magnum to pick-up new driver
 sudo systemctl restart devstack@magnum-{api,cond}
+
+echo 'source <(kubectl completion bash)' >>~/.bashrc
+echo 'alias k=kubectl' >>~/.bashrc
+echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
+
+source ~/.bashrc
