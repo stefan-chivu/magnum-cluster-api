@@ -119,7 +119,7 @@ sudo chmod +x /usr/local/bin/kind
 
 # Create a `kind` cluster inside "docker" group
 newgrp docker <<EOF
-kind create cluster
+kind create cluster --config ~/cluster-config.yaml
 EOF
 
 # Label a control plane node
