@@ -31,12 +31,16 @@ from magnum.conductor.handlers.common import cert_manager as cert_manager_handle
 from oslo_config import cfg
 from oslo_serialization import base64
 from oslo_utils import encodeutils
+from oslo_log import log as logging
+
 
 from magnum_cluster_api import clients, helm, image_utils, images, objects, utils
 from magnum_cluster_api.integrations import cinder, cloud_provider, manila
 
 CONF = cfg.CONF
 CALICO_TAG = "v3.24.2"
+
+LOG = logging.getLogger(__name__)
 
 CLUSTER_CLASS_VERSION = pkg_resources.require("magnum_cluster_api")[0].version
 CLUSTER_CLASS_NAME = f"magnum-v{CLUSTER_CLASS_VERSION}"
@@ -404,7 +408,19 @@ class CertificateAuthoritySecret(ClusterBase):
         if cert_ref is None:
             raise Exception("Certificate for %s doesn't exist." % self.REF)
         ca_cert = self.get_certificate()
-
+        # import pdb; pdb.set_trace()
+        
+        LOG.info("creating k8s secret: %s-%s containing CA cert: \n %s", self.cluster.stack_id, self.CERT, ca_cert.get_certificate())
+        # "ownerReferences": [
+                    #     {
+                    #         "apiVersion": "controlplane.cluster.x-k8s.io/v1beta1",
+                    #         "blockOwnerDeletion": True,
+                    #         "controller": True,
+                    #         "kind": "KubeadmControlPlaneTemplate",
+                    #         "name": CLUSTER_CLASS_NAME,
+                    #         "uid": self.cluster.uuid,
+                    #     },
+                    # ]
         return pykube.Secret(
             self.api,
             {
@@ -417,16 +433,6 @@ class CertificateAuthoritySecret(ClusterBase):
                     "labels": {
                         "cluster.x-k8s.io/cluster-name": f"{self.cluster.stack_id}",
                     },
-                    "ownerReferences": [
-                        {
-                            "apiVersion": "controlplane.cluster.x-k8s.io/v1beta1",
-                            "blockOwnerDeletion": True,
-                            "controller": True,
-                            "kind": "KubeadmControlPlaneTemplate",
-                            "name": CLUSTER_CLASS_NAME,
-                            "uid": self.cluster.uuid,
-                        },
-                    ]
                 },
                 "stringData": {
                     "tls.crt": encodeutils.safe_decode(ca_cert.get_certificate()),
@@ -446,6 +452,7 @@ class ApiCertificateAuthoritySecret(CertificateAuthoritySecret):
     REF = "ca_cert_ref"
 
     def get_certificate(self) -> cert_manager.Cert:
+
         return cert_manager_handlers.get_cluster_ca_certificate(
             self.cluster, self.context, "kubernetes"
         )
